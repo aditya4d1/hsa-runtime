@@ -43,6 +43,8 @@ cmake_minimum_required(VERSION 2.8.0)
 ##    * Delete build folder
 ##    * Follow above 1) 2) 3) steps.
 
+include(FindPackageHandleStandardArgs)
+
 if(WIN32)
   MESSAGE("-------- Windows build is not supported.")
   RETURN()
@@ -66,25 +68,26 @@ else()
   set(IS64BIT 1)
 endif()
 
-if(NOT EXISTS $ENV{HSA_BUILD_INC_PATH}/hsakmt.h)
-  MESSAGE("-------- ERROR: Environment variable HSA_BUILD_INC_PATH is not set to point to the location where KFD Thunk header file hsakmt.h (and rest of the thunk headers) could be found.")
-  RETURN()
-endif()
-
-if(NOT EXISTS $ENV{HSA_BUILD_LIB_PATH}/libhsakmt.so.1)
-  MESSAGE("-------- ERROR: Environment variable HSA_BUILD_LIB_PATH is not set to point to the location where KFD Thunk library libhsakmt.so.1 could be found.")
-  RETURN()
-endif()
-
-MESSAGE(------IS64BIT: ${IS64BIT})
-MESSAGE(------Compiler: ${CMAKE_CXX_COMPILER})
-MESSAGE(------Version: ${CMAKE_CXX_COMPILER_VERSION})
-
 ## Set core runtuime module name and project name.
 set(CORE_RUNTIME_NAME "hsa-runtime${ONLY64STR}")
 project (${CORE_RUNTIME_NAME})
 
 set(CMAKE_BUILD_TYPE ${BUILD_TYPE})
+
+find_path(HSA_BUILD_INC_PATH hsakmt.h HINT $ENV{HSA_BUILD_INC_PATH})
+find_library(HSA_BUILD_LIB_PATH hsakmt HINT $ENV{HSA_BUILD_LIB_PATH})
+
+if(NOT HSA_BUILD_INC_PATH)
+  MESSAGE(FATAL_ERROR "-------- ERROR: HSA_BUILD_INC_PATH is not set to point to the location where KFD Thunk header file hsakmt.h (and rest of the thunk headers) could be found.")
+endif()
+
+if(NOT HSA_BUILD_LIB_PATH)
+  MESSAGE(FATAL_ERROR "-------- ERROR: HSA_BUILD_LIB_PATH is not set to point to the location where KFD Thunk library libhsakmt.so.1 could be found.")
+endif()
+
+MESSAGE(------IS64BIT: ${IS64BIT})
+MESSAGE(------Compiler: ${CMAKE_CXX_COMPILER})
+MESSAGE(------Version: ${CMAKE_CXX_COMPILER_VERSION})
 
 ## Verbose output.
 SET( CMAKE_VERBOSE_MAKEFILE on )
@@ -145,10 +148,10 @@ set (CORE_SRCS ${CORE_SRCS} loader/executable.cpp)
 ## Include path(s).
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 include_directories(${CMAKE_SOURCE_DIR}/../inc)
-include_directories($ENV{HSA_BUILD_INC_PATH})
+include_directories(${HSA_BUILD_INC_PATH})
 
 ## Library path(s).
-link_directories($ENV{HSA_BUILD_LIB_PATH})
+link_directories(${HSA_BUILD_LIB_PATH})
 
 add_library(${CORE_RUNTIME_NAME} SHARED ${CORE_SRCS})
 
