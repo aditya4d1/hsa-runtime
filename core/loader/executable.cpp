@@ -1519,7 +1519,8 @@ hsa_status_t Executable::LoadCodeObject(const hsa_agent_t &agent,
         break;
       }
       default: {
-        break;
+        // Ignore program headers that we aren't related to HSA.
+        continue;
       }
     }
     assert(SIZE_MAX != alseg_ndx);
