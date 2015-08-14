@@ -1,0 +1,63 @@
+This directory contains a simple example program that demonstrates how to
+use the HSA Code Object APIs.
+
+This directory contains three files:
+
+1. The runtime program (hello_world.c)
+2. An example kernel written in assembly (hello_world.s)
+3. An example kernel written in OpenCL C  (hello_world.cl)
+
+===--------------------------------------------------------------------------===
+=== Running the example program
+===--------------------------------------------------------------------------===
+
+The runtime program takes as its input a binary file in the HSA Code Object format.
+The binary should contain a single kernel name "hello_world".  The runtime
+program will setup the appropriate HSA state and then execute the kernel on the
+GPU.
+
+The example kernels write the value of PI to a buffer, so if the program
+executes correctly it will print the value of pi to the terminal:
+
+For example:
+
+hsa@hsa:~/HSA-Runtime-Reference-Source/core/build$ ./hello_world hello
+Using <Spectre>
+pi = 3.14159
+
+===--------------------------------------------------------------------------===
+=== How to generate an HSA Code Object Binary
+===--------------------------------------------------------------------------===
+
+You can generate and HSA Code Object binary to pass to the example using the
+Clang compiler.  This requires building and installing LLVM, Clang, and LLD.
+
+Clang 3.8 or newer is required.
+
+The directions for building llvm/clang are here:
+http://llvm.org/docs/GettingStarted.html
+
+The directions for building lld are here:
+http://lld.llvm.org/ 
+
+Example Commands:
+=================
+
+These examples generate code objects that target carrizo. To target Kaveri,
+replace -mcpu=carrizo with -mcpu=kaveri.
+
+Command for compiling an OpenCL C kernel:
+-----------------------------------------
+clang -Xclang -mlink-bitcode-file -Xclang $BITCODE_LIBRARY -include $BITCODE_LIBARY_HEADER  -Dcl_clang_storage_class_specifiers -target amdgcn--amdhsa -mcpu=carrizo  $INPUT_FILE -o $OUTPUT_FILE
+
+Command for compiling other C-based languages:
+----------------------------------------------
+clang -Xclang -mlink-bitcode-file -Xclang $BITCODE_LIBRARY -include $BITCODE_LIBARY_HEADER  -target amdgcn--amdhsa -mcpu=carrizo  $INPUT_FILE -o $OUTPUT_FILE
+
+Assembler command:
+------------------
+clang -x assembler -target amdgcn--amdhsa -mcpu=carrizo $INPUT_FILE -o $OUTPUT_FILE
+
+
+Note that these options: '-Xclang -mlink-bitcode-file -Xclang $BITCODE_LIBRARY -include $BITCODE_LIBARY_HEADER'
+are only required if you want to link a bitcode library with the kernel.

@@ -159,4 +159,8 @@ add_library ( ${CORE_RUNTIME_LIB} SHARED ${CORE_SRCS} )
 
 set_property ( TARGET ${CORE_RUNTIME_LIB} PROPERTY SOVERSION 1 )
 
+# FIXME: There should probably be an option for building samples
+add_executable(hello_world ../samples/hello_world/hello_world.c)
+target_link_libraries(hello_world ${CORE_RUNTIME_LIB})
+
 target_link_libraries ( ${CORE_RUNTIME_LIB} hsakmt elf c stdc++ dl pthread rt )
