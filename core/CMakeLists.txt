@@ -155,6 +155,10 @@ link_directories(${HSA_BUILD_LIB_PATH})
 
 add_library(${CORE_RUNTIME_NAME} SHARED ${CORE_SRCS})
 
+# FIXME: There should probably be an option for building samples
+add_executable(hello_world ../samples/hello_world/hello_world.c)
+target_link_libraries(hello_world ${CORE_RUNTIME_NAME})
+
 set_property(TARGET ${CORE_RUNTIME_NAME} PROPERTY SOVERSION 1 )
 
 target_link_libraries(${CORE_RUNTIME_NAME} hsakmt elf c stdc++ dl pthread rt)
