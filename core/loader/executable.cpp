@@ -1993,8 +1993,8 @@ hsa_status_t Executable::LoadCodeObject(const hsa_agent_t &agent,
         case R_AMDGPU_32_LOW:
         case R_AMDGPU_32_HIGH: {
           Elf64_Sym vs = sd[ELF64_R_SYM(rd[i].r_info)];
-          assert(STT_SECTION == ELF64_ST_TYPE(vs.st_info) ||
-                 STT_COMMON == ELF64_ST_TYPE(vs.st_info));
+//          assert(STT_SECTION == ELF64_ST_TYPE(vs.st_info) ||
+//                 STT_COMMON == ELF64_ST_TYPE(vs.st_info));
 
           char *symnm =
             elf_strptr(elf, size_t(stshdr->sh_link), size_t(vs.st_name));
