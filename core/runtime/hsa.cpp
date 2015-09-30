@@ -47,6 +47,7 @@
 // HSA C to C++ interface implementation.
 // This file does argument checking and conversion to C++.
 #include <cstring>
+#include <libelf.h>
 #include <set>
 
 #include "core/inc/runtime.h"
@@ -144,6 +145,10 @@ namespace HSA {
 //  Init/Shutdown routines
 //---------------------------------------------------------------------------//
 hsa_status_t HSA_API hsa_init() {
+  // One of the libelf implementations
+  // (http://www.mr511.de/software/english.htm) requires calling
+  // elf_version() before elf_memory().
+  elf_version(EV_CURRENT);
   if (core::Runtime::runtime_singleton_->Acquire()) return HSA_STATUS_SUCCESS;
   return HSA_STATUS_ERROR_REFCOUNT_OVERFLOW;
 }
