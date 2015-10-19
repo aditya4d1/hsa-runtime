@@ -589,17 +589,14 @@ Symbol* ExecutableImpl::GetSymbolInternal(
   }
 
   // TODO(spec): this is not spec compliant.
-  if (!agent.handle) {
     auto program_symbol = program_symbols_.find(mangled_name);
     if (program_symbol != program_symbols_.end()) {
       return program_symbol->second;
     }
-  } else {
     auto agent_symbol = agent_symbols_.find(std::make_pair(mangled_name, agent));
     if (agent_symbol != agent_symbols_.end()) {
       return agent_symbol->second;
     }
-  }
 
   return nullptr;
 }
