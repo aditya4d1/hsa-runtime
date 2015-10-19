@@ -1391,19 +1391,16 @@ hsa_status_t Executable::GetSymbol(const char *module_name,
   }
 
   // TODO(spec): this is not spec compliant.
-  if (!agent.handle) {
     auto program_symbol = program_symbols_.find(mangled_name);
     if (program_symbol != program_symbols_.end()) {
       *symbol = Symbol::EConvert(program_symbol->second);
       return HSA_STATUS_SUCCESS;
     }
-  } else {
     auto agent_symbol = agent_symbols_.find(std::make_pair(mangled_name, agent));
     if (agent_symbol != agent_symbols_.end()) {
       *symbol = Symbol::EConvert(agent_symbol->second);
       return HSA_STATUS_SUCCESS;
     }
-  }
 
   return HSA_STATUS_ERROR_INVALID_SYMBOL_NAME;
 }
