@@ -41,6 +41,8 @@ cmake_minimum_required ( VERSION 2.8.0 )
 ##       can be specified on the cmake command line using the
 ##       "-D CMAKE_BUILD_TYPE:STRING=(Release|Debug)" option.
 
+include(FindPackageHandleStandardArgs)
+
 if ( WIN32 )
     MESSAGE ( FATAL_ERROR "Windows build is not supported." )
 endif ()
@@ -53,14 +55,6 @@ else ()
     set ( IS64BIT 1 )
 endif ()
 
-if ( NOT EXISTS $ENV{HSA_BUILD_INC_PATH}/hsakmt.h )
-    MESSAGE ( FATAL_ERROR "Environment variable HSA_BUILD_INC_PATH is not set to point to the location where KFD Thunk header file hsakmt.h (and rest of the thunk headers) could be found." )
-endif ()
-
-if ( NOT EXISTS $ENV{HSA_BUILD_LIB_PATH}/libhsakmt.so.1 )
-    MESSAGE ( FATAL_ERROR "Environment variable HSA_BUILD_LIB_PATH is not set to point to the location where KFD Thunk library libhsakmt.so.1 could be found." )
-endif ()
-
 MESSAGE ( ------IS64BIT: ${IS64BIT} )
 MESSAGE ( ------Compiler: ${CMAKE_CXX_COMPILER} )
 MESSAGE ( ------Version: ${CMAKE_CXX_COMPILER_VERSION} )
@@ -69,6 +63,19 @@ MESSAGE ( ------Version: ${CMAKE_CXX_COMPILER_VERSION} )
 set ( CORE_RUNTIME_PACKAGE "hsa-runtime" )
 set ( CORE_RUNTIME_LIB "${CORE_RUNTIME_PACKAGE}${ONLY64STR}" )
 project ( ${CORE_RUNTIME_LIB} )
+
+set(CMAKE_BUILD_TYPE ${BUILD_TYPE})
+
+find_path(HSA_BUILD_INC_PATH hsakmt.h HINT $ENV{HSA_BUILD_INC_PATH})
+find_library(HSA_BUILD_LIB_PATH hsakmt HINT $ENV{HSA_BUILD_LIB_PATH})
+
+if(NOT HSA_BUILD_INC_PATH)
+  MESSAGE(FATAL_ERROR "-------- ERROR: HSA_BUILD_INC_PATH is not set to point to the location where KFD Thunk header file hsakmt.h (and rest of the thunk headers) could be found.")
+endif()
+
+if(NOT HSA_BUILD_LIB_PATH)
+  MESSAGE(FATAL_ERROR "-------- ERROR: HSA_BUILD_LIB_PATH is not set to point to the location where KFD Thunk library libhsakmt.so.1 could be found.")
+endif()
 
 ## Verbose output.
 set ( CMAKE_VERBOSE_MAKEFILE on )
@@ -143,10 +150,10 @@ include_directories ( ${CMAKE_SOURCE_DIR}/../inc )
 include_directories ( ${CMAKE_SOURCE_DIR}/inc )
 include_directories ( ${CMAKE_SOURCE_DIR}/tools/libamdhsacode )
 include_directories ( ${CMAKE_SOURCE_DIR}/tools/loader )
-include_directories ( $ENV{HSA_BUILD_INC_PATH} )
+include_directories(${HSA_BUILD_INC_PATH})
 
 ## Library path(s).
-link_directories ( $ENV{HSA_BUILD_LIB_PATH} )
+link_directories(${HSA_BUILD_LIB_PATH})
 
 add_library ( ${CORE_RUNTIME_LIB} SHARED ${CORE_SRCS} )
 
