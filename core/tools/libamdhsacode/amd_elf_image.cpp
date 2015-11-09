@@ -1128,10 +1128,10 @@ namespace amd {
       if (!shstrtabSection->pull(ehdr.e_shstrndx)) { return false; }
 
       Elf_Scn* scn = 0;
-      size_t n = 0;
       sections.push_back(std::unique_ptr<GElfSection>());
       while ((scn = elf_nextscn(e, scn)) != 0) {
-        if (n++ == ehdr.e_shstrndx) {
+        size_t section_idx = elf_ndxscn(scn);
+        if (section_idx == ehdr.e_shstrndx) {
           sections.push_back(std::unique_ptr<GElfSection>(shstrtabSection));
           continue;
         }
@@ -1151,7 +1151,7 @@ namespace amd {
         }
         if (section) {
           sections.push_back(std::unique_ptr<GElfSection>(section));
-          if (!section->pull(n)) { return false; }
+          if (!section->pull(section_idx)) { return false; }
         }
       }
 
