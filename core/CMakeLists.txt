@@ -66,12 +66,8 @@ project ( ${CORE_RUNTIME_LIB} )
 
 set(CMAKE_BUILD_TYPE ${BUILD_TYPE})
 
-find_path(HSA_BUILD_INC_PATH hsakmt.h HINT $ENV{HSA_BUILD_INC_PATH})
+set(HSA_BUILD_INC_PATH ${CMAKE_SOURCE_DIR}/inc)
 find_library(HSA_BUILD_LIB_PATH hsakmt HINT $ENV{HSA_BUILD_LIB_PATH})
-
-if(NOT HSA_BUILD_INC_PATH)
-  MESSAGE(FATAL_ERROR "-------- ERROR: HSA_BUILD_INC_PATH is not set to point to the location where KFD Thunk header file hsakmt.h (and rest of the thunk headers) could be found.")
-endif()
 
 if(NOT HSA_BUILD_LIB_PATH)
   MESSAGE(FATAL_ERROR "-------- ERROR: HSA_BUILD_LIB_PATH is not set to point to the location where KFD Thunk library libhsakmt.so.1 could be found.")
